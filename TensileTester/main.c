@@ -43,6 +43,8 @@ int main(void)
 	spi_init();
 
 	while (1) {
+		if (!(PORTD.IN & PIN1_bm)) {PORTC.OUT &= ~PIN0_bm;}
+		
 		if (!(PORTC.IN & PIN2_bm))
 		{
 			spi_rw(ADC_RS_DATA_gc | ADC_RDEN_bm | ADC_CS_FD12_gc); // Read from data register on fd channel 1/2
@@ -51,7 +53,6 @@ int main(void)
 			length_data = (length_data << 8) | spi_rw(0xff);
 			length_data = (length_data << 8) | spi_rw(0xff);
 			
-			//while (!(PORTC.IN & PIN2_bm));
 			while (PORTC.IN & PIN2_bm);
 			
 			
@@ -62,7 +63,6 @@ int main(void)
 			stress_data = (stress_data << 8) | spi_rw(0xff);
 			
 			uart_putdata(length_data,stress_data);
-			//while (PORTC.IN & PIN2_bm);
 		}
 		
 	}

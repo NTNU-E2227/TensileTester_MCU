@@ -29,12 +29,12 @@ void spi_init(void)
 	spi_rw(0xff);
 	
 	
-	spi_rw(ADC_RS_FH_gc | ADC_FH_BST_bm | ADC_CS_FD34_gc); //Write to filter high on fd channel 3/4
+	spi_rw(ADC_RS_FH_gc | ADC_CS_FD34_gc); //Write to filter high on fd channel 3/4
 	spi_rw(ADC_FH_WL_bm | 0x01); //Word length 24-bit
 	spi_rw(ADC_RS_FL_gc | ADC_CS_FD34_gc); //Write to filter low on fd channel 3/4
 	spi_rw(0x80); //Filter to 50 Hz
 	spi_rw(ADC_RS_MODE_gc | ADC_CS_FD34_gc); //Write to mode register on fd channel 3/4
-	spi_rw(ADC_MR_SC_gc | ADC_MR_GAIN128_gc); //Run self calibration, 128x gain
+	spi_rw(ADC_MR_SC_gc); //Run self calibration
 	
 	spi_rw(0xff);
 	

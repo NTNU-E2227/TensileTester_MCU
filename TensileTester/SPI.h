@@ -19,6 +19,7 @@
 #define ADC_MR_GAIN64_gc 0x18
 #define ADC_MR_GAIN128_gc 0x1c
 #define ADC_MR_SC_gc 0x20
+#define ADC_MR_FSSC_gc 0xe0
 
 void spi_init(void);
 uint8_t spi_rw(uint8_t out_data);
