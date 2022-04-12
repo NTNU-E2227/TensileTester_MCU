@@ -9,10 +9,10 @@
 
 void spi_init(void)
 {
-	PORTC.OUT &= ~PIN4_bm;
+	PORTC.OUT &= ~PIN4_bm; // Reset ADC pin
 	
     SPI0.CTRLB = SPI_BUFEN_bm | SPI_BUFWR_bm | SPI_SSD_bm | SPI_MODE_3_gc;
-    SPI0.CTRLA = SPI_MASTER_bm | SPI_PRESC_DIV16_gc | SPI_ENABLE_bm;
+    SPI0.CTRLA = SPI_MASTER_bm | SPI_PRESC_DIV128_gc | SPI_ENABLE_bm;
 	
 	_delay_ms(10);
 	PORTC.OUT |= PIN4_bm;
@@ -44,6 +44,7 @@ uint8_t spi_rw(uint8_t out_data)
 {
 	while (!(SPI0.INTFLAGS & SPI_DREIF_bm));
 	SPI0.DATA = out_data;
+	while (!(SPI0.INTFLAGS & SPI_TXCIF_bm));
 	while (!(SPI0.INTFLAGS & SPI_RXCIF_bm));
 	return SPI0.DATA;
 }

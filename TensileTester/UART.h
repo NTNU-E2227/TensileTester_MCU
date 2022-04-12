@@ -7,6 +7,6 @@
 void uart_init(void);
 void uart_putchar(char c);
 void uart_putdata(uint32_t length, uint32_t force);
-void com_handler(uint32_t in_data);
+void com_handler(uint64_t in_data);
 
 #endif /* UART_H_ */

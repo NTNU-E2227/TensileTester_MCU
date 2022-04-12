@@ -11,7 +11,7 @@
 
 ISR(USART3_RXC_vect)
 {
-	static uint32_t buffer = 0;
+	static uint64_t buffer = 0;
 	uint8_t input = USART3.RXDATAL;
 	
 	if (input == '\n')
@@ -41,29 +41,39 @@ int main(void)
 	uart_init();
 	pwm_init();
 	spi_init();
-
+	
+	spi_rw(ADC_RS_DATA_gc | ADC_RDEN_bm | ADC_CS_FD12_gc); // Read from data register on fd channel 1/2
+	
+	uint8_t i = 1;
+	uint32_t length_data = 0;
+	uint32_t stress_data = 0;
+		
 	while (1) {
-		if (!(PORTD.IN & PIN1_bm)) {PORTC.OUT &= ~PIN0_bm;}
+		
+		if (!(PORTD.IN & PIN1_bm)) {PORTC.OUT &= ~PIN0_bm;} // Motor off when UARTsignal lost
 		
 		if (!(PORTC.IN & PIN2_bm))
 		{
-			spi_rw(ADC_RS_DATA_gc | ADC_RDEN_bm | ADC_CS_FD12_gc); // Read from data register on fd channel 1/2
-			uint32_t length_data = 0;
-			length_data = spi_rw(0xff);
-			length_data = (length_data << 8) | spi_rw(0xff);
-			length_data = (length_data << 8) | spi_rw(0xff);
-			
-			while (PORTC.IN & PIN2_bm);
-			
-			
-			spi_rw(ADC_RS_DATA_gc | ADC_RDEN_bm | ADC_CS_FD34_gc); // Read from data register on fd channel 3/4
-			uint32_t stress_data = 0;
-			stress_data = spi_rw(0xff);
-			stress_data = (stress_data << 8) | spi_rw(0xff);
-			stress_data = (stress_data << 8) | spi_rw(0xff);
-			
-			uart_putdata(length_data,stress_data);
+			if (i)
+			{
+				length_data = 0;
+				length_data = spi_rw(0xff);
+				length_data = (length_data << 8) | spi_rw(0xff);
+				length_data = (length_data << 8) | spi_rw(0xff);
+				spi_rw(ADC_RS_DATA_gc | ADC_RDEN_bm | ADC_CS_FD34_gc); // Read from data register on fd channel 3/4
+				i = 0;
+			}
+			else
+			{
+				stress_data = 0;
+				stress_data = spi_rw(0xff);
+				stress_data = (stress_data << 8) | spi_rw(0xff);
+				stress_data = (stress_data << 8) | spi_rw(0xff);
+				spi_rw(ADC_RS_DATA_gc | ADC_RDEN_bm | ADC_CS_FD12_gc); // Read from data register on fd channel 1/2
+				uart_putdata(length_data,stress_data);
+				i = 1;
+			}
+			while (!(PORTC.IN & PIN2_bm));
 		}
-		
 	}
 }
